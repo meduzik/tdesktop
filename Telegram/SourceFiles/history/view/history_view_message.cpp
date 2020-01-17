@@ -130,26 +130,8 @@ QString FastReplyText() {
 }
 
 void PaintBubble(Painter &p, QRect rect, int outerWidth, bool selected, bool outbg, RectPart tailSide) {
-	auto &bg = selected ? (outbg ? st::msgOutBgSelected : st::msgInBgSelected) : (outbg ? st::msgOutBg : st::msgInBg);
-	auto &sh = selected ? (outbg ? st::msgOutShadowSelected : st::msgInShadowSelected) : (outbg ? st::msgOutShadow : st::msgInShadow);
-	auto cors = selected ? (outbg ? MessageOutSelectedCorners : MessageInSelectedCorners) : (outbg ? MessageOutCorners : MessageInCorners);
-	auto parts = RectPart::FullTop | RectPart::NoTopBottom | RectPart::Bottom;
-	if (tailSide == RectPart::Right) {
-		parts |= RectPart::BottomLeft;
-		p.fillRect(rect.x() + rect.width() - st::historyMessageRadius, rect.y() + rect.height() - st::historyMessageRadius, st::historyMessageRadius, st::historyMessageRadius, bg);
-		auto &tail = selected ? st::historyBubbleTailOutRightSelected : st::historyBubbleTailOutRight;
-		tail.paint(p, rect.x() + rect.width(), rect.y() + rect.height() - tail.height(), outerWidth);
-		p.fillRect(rect.x() + rect.width() - st::historyMessageRadius, rect.y() + rect.height(), st::historyMessageRadius + tail.width(), st::msgShadow, sh);
-	} else if (tailSide == RectPart::Left) {
-		parts |= RectPart::BottomRight;
-		p.fillRect(rect.x(), rect.y() + rect.height() - st::historyMessageRadius, st::historyMessageRadius, st::historyMessageRadius, bg);
-		auto &tail = selected ? (outbg ? st::historyBubbleTailOutLeftSelected : st::historyBubbleTailInLeftSelected) : (outbg ? st::historyBubbleTailOutLeft : st::historyBubbleTailInLeft);
-		tail.paint(p, rect.x() - tail.width(), rect.y() + rect.height() - tail.height(), outerWidth);
-		p.fillRect(rect.x() - tail.width(), rect.y() + rect.height(), st::historyMessageRadius + tail.width(), st::msgShadow, sh);
-	} else {
-		parts |= RectPart::FullBottom;
-	}
-	App::roundRect(p, rect, bg, cors, &sh, parts);
+	auto &bg = st::msgOutBgSelected;
+	p.fillRect(rect.x(), rect.y(), rect.width(), rect.height(), bg);
 }
 
 style::color FromNameFg(PeerId peerId, bool selected) {
@@ -437,7 +419,10 @@ void Message::draw(
 			|| (media && media->skipBubbleTail())
 			|| (keyboard != nullptr);
 		auto displayTail = skipTail ? RectPart::None : (outbg && !Adaptive::ChatWide()) ? RectPart::Right : RectPart::Left;
-		PaintBubble(p, g, width(), selected, outbg, displayTail);
+		
+		if (selected) {
+			PaintBubble(p, g, width(), selected, outbg, displayTail);
+		}
 
 		// Entry page is always a bubble bottom.
 		auto mediaOnBottom = (mediaDisplayed && media->isBubbleBottom()) || (entry/* && entry->isBubbleBottom()*/);

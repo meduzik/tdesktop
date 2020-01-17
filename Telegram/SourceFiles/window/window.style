@@ -22,7 +22,7 @@ columnDesiredWidthMain: 512px;
 columnMinimalWidthThird: 292px;
 columnMaximalWidthThird: 392px;
 
-adaptiveChatWideWidth: 880px;
+adaptiveChatWideWidth: 0px;
 
 notifyBorder: windowShadowFgFallback;
 notifyBorderWidth: 1px;
